@@ -70,7 +70,7 @@ CREATE OR ALTER PROCEDURE [dbo].[spGetSecretKeyQuestionsForUser](
 	@Email varchar(255))
 AS
 BEGIN
-	SELECT SecretKeyQuestion,SecretKeyAnswer FROM UserSecretQuestion WHERE UserID = (SELECT UserID FROM User WHERE Email = @Email)
+	SELECT SecretKeyQuestion,SecretKeyAnswer FROM UserSecretQuestion WHERE UserID = (SELECT UserID FROM [User] WHERE Email = @Email)
 END
 GO
 CREATE OR ALTER PROCEDURE [dbo].[SPAuthenticate](
