@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
-            panel1 = new Panel();
             expensePlusLogo = new PictureBox();
             gbLogin = new GroupBox();
+            chkShowPasswordLogin = new CheckBox();
             picLogo = new PictureBox();
             lnkForgotPassword = new LinkLabel();
             lnkLabel = new LinkLabel();
@@ -41,29 +41,21 @@
             txtUserName = new TextBox();
             lblUsername = new Label();
             lblLogin = new Label();
-            panel1.SuspendLayout();
+            panel1 = new Panel();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)expensePlusLogo).BeginInit();
             gbLogin.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
+            panel1.SuspendLayout();
             SuspendLayout();
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(expensePlusLogo);
-            panel1.Dock = DockStyle.Left;
-            panel1.Location = new Point(0, 0);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(526, 759);
-            panel1.TabIndex = 0;
             // 
             // expensePlusLogo
             // 
-            expensePlusLogo.Dock = DockStyle.Fill;
             expensePlusLogo.Image = Properties.Resources.pexels_anna_nekrashevich_6802049;
-            expensePlusLogo.Location = new Point(0, 0);
+            expensePlusLogo.Location = new Point(-36, 0);
             expensePlusLogo.Margin = new Padding(0);
             expensePlusLogo.Name = "expensePlusLogo";
-            expensePlusLogo.Size = new Size(526, 759);
+            expensePlusLogo.Size = new Size(530, 806);
             expensePlusLogo.SizeMode = PictureBoxSizeMode.Zoom;
             expensePlusLogo.TabIndex = 0;
             expensePlusLogo.TabStop = false;
@@ -71,6 +63,8 @@
             // gbLogin
             // 
             gbLogin.BackColor = Color.White;
+            gbLogin.Controls.Add(button1);
+            gbLogin.Controls.Add(chkShowPasswordLogin);
             gbLogin.Controls.Add(picLogo);
             gbLogin.Controls.Add(lnkForgotPassword);
             gbLogin.Controls.Add(lnkLabel);
@@ -80,16 +74,26 @@
             gbLogin.Controls.Add(txtUserName);
             gbLogin.Controls.Add(lblUsername);
             gbLogin.Controls.Add(lblLogin);
-            gbLogin.Location = new Point(532, 12);
+            gbLogin.Location = new Point(454, 0);
             gbLogin.Name = "gbLogin";
-            gbLogin.Size = new Size(841, 610);
+            gbLogin.Size = new Size(963, 806);
             gbLogin.TabIndex = 1;
             gbLogin.TabStop = false;
+            // 
+            // chkShowPasswordLogin
+            // 
+            chkShowPasswordLogin.AutoSize = true;
+            chkShowPasswordLogin.Location = new Point(618, 372);
+            chkShowPasswordLogin.Name = "chkShowPasswordLogin";
+            chkShowPasswordLogin.Size = new Size(134, 24);
+            chkShowPasswordLogin.TabIndex = 12;
+            chkShowPasswordLogin.Text = "Show password";
+            chkShowPasswordLogin.UseVisualStyleBackColor = true;
             // 
             // picLogo
             // 
             picLogo.Image = Properties.Resources.EXPENSE;
-            picLogo.Location = new Point(-3, 0);
+            picLogo.Location = new Point(742, 0);
             picLogo.Name = "picLogo";
             picLogo.Size = new Size(221, 202);
             picLogo.SizeMode = PictureBoxSizeMode.Zoom;
@@ -100,18 +104,19 @@
             // 
             lnkForgotPassword.AutoSize = true;
             lnkForgotPassword.Font = new Font("MS UI Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lnkForgotPassword.Location = new Point(420, 439);
+            lnkForgotPassword.Location = new Point(506, 493);
             lnkForgotPassword.Name = "lnkForgotPassword";
             lnkForgotPassword.Size = new Size(149, 20);
             lnkForgotPassword.TabIndex = 7;
             lnkForgotPassword.TabStop = true;
             lnkForgotPassword.Text = "Forgot Password";
+            lnkForgotPassword.LinkClicked += lnkForgotPassword_LinkClicked;
             // 
             // lnkLabel
             // 
             lnkLabel.AutoSize = true;
             lnkLabel.Font = new Font("MS UI Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lnkLabel.Location = new Point(350, 390);
+            lnkLabel.Location = new Point(301, 493);
             lnkLabel.Name = "lnkLabel";
             lnkLabel.Size = new Size(142, 20);
             lnkLabel.TabIndex = 6;
@@ -124,7 +129,7 @@
             btnLogin.BackColor = Color.Violet;
             btnLogin.Font = new Font("MS UI Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point);
             btnLogin.ForeColor = Color.White;
-            btnLogin.Location = new Point(297, 435);
+            btnLogin.Location = new Point(435, 427);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(94, 29);
             btnLogin.TabIndex = 5;
@@ -134,18 +139,20 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(297, 321);
+            txtPassword.Location = new Point(390, 369);
             txtPassword.Name = "txtPassword";
             txtPassword.PasswordChar = '*';
             txtPassword.PlaceholderText = "Please enter your password";
             txtPassword.Size = new Size(210, 27);
             txtPassword.TabIndex = 4;
+            txtPassword.KeyDown += txtPassword_KeyDown;
+            txtPassword.MouseHover += txtPassword_MouseHover;
             // 
             // lblPassword
             // 
             lblPassword.AutoSize = true;
             lblPassword.Font = new Font("MS UI Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lblPassword.Location = new Point(297, 298);
+            lblPassword.Location = new Point(390, 346);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(89, 20);
             lblPassword.TabIndex = 3;
@@ -153,7 +160,7 @@
             // 
             // txtUserName
             // 
-            txtUserName.Location = new Point(297, 222);
+            txtUserName.Location = new Point(386, 250);
             txtUserName.Name = "txtUserName";
             txtUserName.PlaceholderText = "Please enter your username";
             txtUserName.Size = new Size(210, 27);
@@ -163,7 +170,7 @@
             // 
             lblUsername.AutoSize = true;
             lblUsername.Font = new Font("MS UI Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lblUsername.Location = new Point(297, 199);
+            lblUsername.Location = new Point(386, 227);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(93, 20);
             lblUsername.TabIndex = 1;
@@ -172,38 +179,60 @@
             // lblLogin
             // 
             lblLogin.AutoSize = true;
-            lblLogin.Font = new Font("Microsoft Sans Serif", 30F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
+            lblLogin.Font = new Font("Microsoft Sans Serif", 48F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
             lblLogin.ForeColor = Color.Violet;
-            lblLogin.Location = new Point(327, 52);
+            lblLogin.Location = new Point(360, 63);
             lblLogin.Name = "lblLogin";
-            lblLogin.Size = new Size(153, 58);
+            lblLogin.Size = new Size(237, 91);
             lblLogin.TabIndex = 0;
             lblLogin.Text = "Login";
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(expensePlusLogo);
+            panel1.Dock = DockStyle.Left;
+            panel1.Location = new Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(526, 806);
+            panel1.TabIndex = 0;
+            // 
+            // button1
+            // 
+            button1.BackColor = Color.Red;
+            button1.ForeColor = Color.White;
+            button1.Location = new Point(914, 12);
+            button1.Name = "button1";
+            button1.Size = new Size(43, 29);
+            button1.TabIndex = 13;
+            button1.Text = "X";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
             // 
             // Login
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1399, 759);
+            ClientSize = new Size(1417, 806);
             Controls.Add(gbLogin);
             Controls.Add(panel1);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Login";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Login";
-            panel1.ResumeLayout(false);
+            MouseDown += Login_MouseDown;
+            MouseMove += Login_MouseMove;
+            MouseUp += Login_MouseUp;
             ((System.ComponentModel.ISupportInitialize)expensePlusLogo).EndInit();
             gbLogin.ResumeLayout(false);
             gbLogin.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Panel panel1;
         private PictureBox expensePlusLogo;
         private GroupBox gbLogin;
         private Label lblLogin;
@@ -215,5 +244,8 @@
         private Button btnLogin;
         private LinkLabel lnkForgotPassword;
         private PictureBox picLogo;
+        private Panel panel1;
+        private CheckBox chkShowPasswordLogin;
+        private Button button1;
     }
 }

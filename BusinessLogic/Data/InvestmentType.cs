@@ -16,24 +16,16 @@ namespace ExpensePlus.BusinessLogic.Data
         public string InvestmentTypeDescription { get; set; }
         #endregion
         #region public methods
-        public List<InvestmentType> GetAllInvestmentTypes()
+        public DataSet GetAllInvestmentTypes()
         {
-            List<InvestmentType> investmentTypes = new List<InvestmentType>();
+            DataSet investmentTypes = new DataSet();
             using (var sqlConnection = new SqlConnection(ExpensePlus.BusinessLogic.Common.SQLConnection.DatabaseConnection))
             {
                 using (SqlCommand sqlCommand = new SqlCommand("spGetAllInvestmentType", sqlConnection))
                 {
-                    DataTable dt = new DataTable();
                     sqlCommand.CommandType = CommandType.StoredProcedure;
                     SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
-                    sqlDataAdapter.Fill(dt);
-                    investmentTypes = dt.AsEnumerable().Select(x =>
-                        new InvestmentType()
-                        {
-                            InvestmentTypeID = x.Field<int>("InvestmentTypeID"),
-                            InvestmentTypeName = x.Field<string>("InvestmentTypeName")
-                        }
-                    ).ToList();
+                    sqlDataAdapter.Fill(investmentTypes);
                 }
             }
             return investmentTypes;

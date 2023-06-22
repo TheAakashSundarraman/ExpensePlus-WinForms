@@ -12,7 +12,7 @@ using System.Configuration;
 
 namespace ExpensePlus.BusinessLogic.Data
 {
-    public class Investments
+    public class Investments : IInvestments
     {
         private readonly User user;
 
@@ -35,6 +35,7 @@ namespace ExpensePlus.BusinessLogic.Data
         public string InvestmentDescription { get; set; }
         public decimal InvestmentValue5 { get; set; }
         public decimal InvestmentValue10 { get; set; }
+        public bool IsNew { get; set; }
         #endregion
         public DataSet GetAllInvestmentsForUser()
         {
@@ -101,7 +102,7 @@ namespace ExpensePlus.BusinessLogic.Data
             bool isInvestmentAdded = false;
             try
             {
-                if (InvestmentID != Guid.Empty)
+                if (!IsNew)
                 {
                     isInvestmentAdded = UpdateExistingInvestment(_user);
                 }
@@ -122,6 +123,9 @@ namespace ExpensePlus.BusinessLogic.Data
             {
                 using (var sqlConnection = new SqlConnection(ExpensePlus.BusinessLogic.Common.SQLConnection.DatabaseConnection))
                 {
+                    decimal intrestRate = decimal.Parse(System.Configuration.ConfigurationManager.AppSettings["AnnualIntrestRate"]);
+                    decimal investmentValue5 = GetInvestmentProjectionValue(InvestmentAmount, intrestRate, 5);
+                    decimal investmentValue10 = GetInvestmentProjectionValue(InvestmentAmount, intrestRate, 10);
                     using (SqlCommand sqlCommand = new SqlCommand("spUpdateInvestmentForUser", sqlConnection))
                     {
                         sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -132,6 +136,8 @@ namespace ExpensePlus.BusinessLogic.Data
                         sqlCommand.Parameters.AddWithValue("@InvestmentAmount", this.InvestmentAmount);
                         sqlCommand.Parameters.AddWithValue("@InvestmentDescription", this.InvestmentDescription);
                         sqlCommand.Parameters.AddWithValue("@InvestmentTypeID", this.InvestmentTypeId);
+                        sqlCommand.Parameters.AddWithValue("@InvestmentValue5", investmentValue5);
+                        sqlCommand.Parameters.AddWithValue("@InvestmentValue10", investmentValue10);
                         sqlConnection.Open();
                         sqlCommand.ExecuteNonQuery();
                         ComputeInvestmentProjections(InvestmentID);
@@ -139,7 +145,7 @@ namespace ExpensePlus.BusinessLogic.Data
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -168,6 +174,44 @@ namespace ExpensePlus.BusinessLogic.Data
             }
             return false;
         }
+        public List<string> GetStockNamesForUser(User user)
+        {
+            List<string> stockNames = new List<string>();
+            try
+            {
+                using (var sqlConnection = new SqlConnection(ExpensePlus.BusinessLogic.Common.SQLConnection.DatabaseConnection))
+                {
+                    using (SqlCommand sqlCommand = new SqlCommand("spGetAllStockNamesForUser", sqlConnection))
+                    {
+                        sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                        sqlCommand.Parameters.AddWithValue("@UserID", user.UserID);
+                        sqlConnection.Open();
+                        SqlDataReader reader = sqlCommand.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader.HasRows && reader.GetValue(0) != null)
+                            {
+                                stockNames.Add(reader.GetValue(0).ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error occured during fetching stock names");
+            }
+
+            return stockNames;
+
+        }
+        public List<Stock> GetStockInformationFromNasdaq()
+        {
+            var csvLines = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\Database\\nasdaq_stock_data.csv");
+            var csvLinesData = csvLines.Skip(1).Select(x => x.Split(',')).ToArray();
+            var stockMasterList = csvLinesData.Select(x => new Stock() { StockSymbol = x[0], StockName = x[1] }).ToList();
+            return stockMasterList;
+        }
         private bool AddNewInvestment()
         {
             try
@@ -177,8 +221,8 @@ namespace ExpensePlus.BusinessLogic.Data
                     using (SqlCommand sqlCommand = new SqlCommand("spAddInvestmentForUser", sqlConnection))
                     {
                         decimal intrestRate = decimal.Parse(System.Configuration.ConfigurationManager.AppSettings["AnnualIntrestRate"]);
-                        var investmentValue5 = Math.Pow((double)(InvestmentAmount * (1 + intrestRate / 100)), 5);
-                        var investmentValue10 = Math.Pow((double)(InvestmentAmount * (1 + intrestRate / 100)), 10);
+                        decimal investmentValue5 = GetInvestmentProjectionValue(InvestmentAmount, intrestRate, 5);
+                        decimal investmentValue10 = GetInvestmentProjectionValue(InvestmentAmount, intrestRate, 10);
                         InvestmentID = Guid.NewGuid();
                         sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                         sqlCommand.Parameters.AddWithValue("@UserID", user.UserID);
@@ -188,7 +232,7 @@ namespace ExpensePlus.BusinessLogic.Data
                         sqlCommand.Parameters.AddWithValue("@InvestmentAmount", this.InvestmentAmount);
                         sqlCommand.Parameters.AddWithValue("@InvestmentDescription", this.InvestmentDescription);
                         sqlCommand.Parameters.AddWithValue("@InvestmentTypeID", this.InvestmentTypeId);
-                        sqlCommand.Parameters.AddWithValue("@InvestmentValue5", investmentValue5) ;
+                        sqlCommand.Parameters.AddWithValue("@InvestmentValue5", investmentValue5);
                         sqlCommand.Parameters.AddWithValue("@InvestmentValue10", investmentValue10);
                         sqlConnection.Open();
                         sqlCommand.ExecuteNonQuery();
@@ -203,26 +247,53 @@ namespace ExpensePlus.BusinessLogic.Data
             }
             return false;
         }
+        private decimal GetInvestmentProjectionValue(decimal InvestmentAmount, decimal intrestRate, int numberOfYears = 0)
+        {
+            decimal investmentProjectionValue = 0;
+            switch (numberOfYears)
+            {
+                case 0:
+                    investmentProjectionValue = InvestmentAmount * (1 + (intrestRate / 100));
+                    break;
+                default:
+                    for (int i = 0; i < numberOfYears; i++)
+                    {
+                        decimal projectionValue = 0;
+                        projectionValue = InvestmentAmount * (1 + (intrestRate / 100));
+                        InvestmentAmount = projectionValue;
+                    }
+                    investmentProjectionValue = InvestmentAmount;
+                    break;
+            }
+            return investmentProjectionValue;
+        }
         private void ComputeInvestmentProjections(Guid investmentID)
         {
-            int numberofYearstoComputeInvestmentProjection = int.Parse(System.Configuration.ConfigurationManager.AppSettings["NumberofYearstoComputeInvestmentProjection"]);
+            int numberofYearstoComputeInvestmentProjection = int.Parse(ConfigurationManager.AppSettings["NumberofYearstoComputeInvestmentProjection"]);
             int currentYear = DateTime.Now.Year;
-            decimal intrestRate = decimal.Parse(System.Configuration.ConfigurationManager.AppSettings["AnnualIntrestRate"]);
+            decimal intrestRate = decimal.Parse(ConfigurationManager.AppSettings["AnnualIntrestRate"]);
             DataSet existingInvestmentProjections = CheckInvstmentAlreadyExists(InvestmentID);
-            for (int i = 0; i < numberofYearstoComputeInvestmentProjection; i++)
+            if (existingInvestmentProjections.Tables[0].Rows.Count == 0)
             {
-                decimal projectionValue = 0;
-                projectionValue = InvestmentAmount * (1 + intrestRate / 100);
-                if (existingInvestmentProjections.Tables[0].Rows.Count == 0)
-                {    
-                    AddInvestmentProjection(currentYear, projectionValue);
-                }
-                else
+                for (int i = 0; i < numberofYearstoComputeInvestmentProjection; i++)
                 {
-                    UpdateInvestmentProjection(currentYear, projectionValue, existingInvestmentProjections);
+                    decimal projectionValue = GetInvestmentProjectionValue(InvestmentAmount, intrestRate);
+                    AddInvestmentProjection(currentYear, projectionValue);
+                    InvestmentAmount = projectionValue;
+                    currentYear++;
                 }
-                InvestmentAmount = projectionValue;
-                currentYear++;
+
+            }
+            else
+            {
+                for (int i = 0; i < numberofYearstoComputeInvestmentProjection; i++)
+                {
+                    decimal projectionValue = GetInvestmentProjectionValue(InvestmentAmount, intrestRate);
+                    UpdateInvestmentProjection(currentYear, projectionValue, existingInvestmentProjections);
+                    InvestmentAmount = projectionValue;
+                    currentYear++;
+                }
+
             }
         }
         private void AddInvestmentProjection(int currentYear, decimal projectionValue)

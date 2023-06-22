@@ -34,6 +34,7 @@
             logoImage = new PictureBox();
             pgBar = new ProgressBar();
             tmrForm = new System.Windows.Forms.Timer(components);
+            lblNotFinancialAdvice = new Label();
             pnlLogo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)logoImage).BeginInit();
             SuspendLayout();
@@ -71,22 +72,37 @@
             // 
             tmrForm.Tick += tmrForm_Tick;
             // 
+            // lblNotFinancialAdvice
+            // 
+            lblNotFinancialAdvice.AutoSize = true;
+            lblNotFinancialAdvice.ForeColor = Color.Orchid;
+            lblNotFinancialAdvice.Location = new Point(605, 550);
+            lblNotFinancialAdvice.Name = "lblNotFinancialAdvice";
+            lblNotFinancialAdvice.Size = new Size(153, 20);
+            lblNotFinancialAdvice.TabIndex = 2;
+            lblNotFinancialAdvice.Text = "*Not financial advice*";
+            // 
             // Loading
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1388, 749);
+            ClientSize = new Size(1417, 806);
+            Controls.Add(lblNotFinancialAdvice);
             Controls.Add(pgBar);
             Controls.Add(pnlLogo);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Loading";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Loading";
+            MouseDown += Loading_MouseDown;
+            MouseMove += Loading_MouseMove;
+            MouseUp += Loading_MouseUp;
             pnlLogo.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)logoImage).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -95,5 +111,6 @@
         private PictureBox logoImage;
         private ProgressBar pgBar;
         private System.Windows.Forms.Timer tmrForm;
+        private Label lblNotFinancialAdvice;
     }
 }

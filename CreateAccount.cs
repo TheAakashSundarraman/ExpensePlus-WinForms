@@ -15,6 +15,9 @@ namespace ExpensePlus
     {
         private Lazy<Gender> gender;
         private Lazy<BusinessLogic.Login.User> user;
+        private bool dragging = false;
+        private Point dragCursorPoint;
+        private Point dragFormPoint;
         public CreateAccount()
         {
             InitializeComponent();
@@ -45,13 +48,21 @@ namespace ExpensePlus
                 user.Value.Email = txtEmail.Text;
                 user.Value.PhoneNumber = txtPhone.Text;
                 user.Value.Password = txtPassword.Text;
-                user.Value.RoleID = "81A80B8D-25A7-469B-AE68-9FBC4054D83B";
+                user.Value.RoleID = new Role().GetAllRoles().AsEnumerable().Where(x => x.Field<string>("RoleType") == "AD").Select(x => x.Field<Guid>("RoleID").ToString()).FirstOrDefault();
                 if (chkLstBoxGender.SelectedItem != null)
                     user.Value.GenderID = gender.Value.GetGenderIDbyValue(chkLstBoxGender.SelectedItem.ToString());
-                if (user.Value.AddUser())
+                SecretKeyQuestionAnswers secretKeyQuestionAnswers = new SecretKeyQuestionAnswers();
+                secretKeyQuestionAnswers.SecretKeyQuestion = txtSecretKeyQuestion.Text;
+                secretKeyQuestionAnswers.SecretKeyAnswer = txtSecretKeyAnswer.Text;
+                if (new BusinessLogic.Login.User().GetUserByEmail(txtEmail.Text) != null)
+                {
+                    MessageBox.Show("User Already exists, please login or use the forgot password screen");
+                    this.Hide();
+                    return;
+                }
+                if (user.Value.AddUser(secretKeyQuestionAnswers))
                 {
                     MessageBox.Show("User Added successfully, please login using the credentials.");
-                    this.Parent.Show();
                     this.Hide();
                 }
                 else
@@ -65,9 +76,41 @@ namespace ExpensePlus
                 if (ix != e.Index) chkLstBoxGender.SetItemChecked(ix, false);
         }
 
-        private void CreateAccount_FormClosed(object sender, FormClosedEventArgs e)
+        private void btnBackToLoginCreateAccountOne_MouseClick(object sender, MouseEventArgs e)
         {
-            new Login().Show();
+            this.Hide();
+            new Login().ShowDialog(this);
+        }
+
+        private void CreateAccount_MouseDown(object sender, MouseEventArgs e)
+        {
+            dragging = true;
+            dragCursorPoint = Cursor.Position;
+            dragFormPoint = this.Location;
+        }
+
+        private void CreateAccount_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (dragging)
+            {
+                Point dif = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
+                this.Location = Point.Add(dragFormPoint, new Size(dif));
+            }
+        }
+
+        private void CreateAccount_MouseUp(object sender, MouseEventArgs e)
+        {
+            dragging = false;
+        }
+
+        private void CreateAccount_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            new Login().ShowDialog();
+        }
+
+        private void txtPassword_MouseHover(object sender, EventArgs e)
+        {
+            txtPassword.PasswordChar = chkShowPasswordCreate.Checked ? '\0' : '*';
         }
     }
 }
