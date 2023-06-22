@@ -10,23 +10,23 @@
 --GO
 --Drop table Role;
 --GO
-Create table Role(RoleID uniqueidentifier PRIMARY KEY, RoleType varchar(255), RoleName varchar(255), RoleDescription varchar(500));
+Create table Role(RoleID uniqueidentifier PRIMARY KEY, RoleType varchar(10), RoleName varchar(15), RoleDescription varchar(200));
 GO
-CREATE TABLE [GENDER](GENDERID INT IDENTITY(1,1) PRIMARY KEY, GENDERNAME VARCHAR(50))
+CREATE TABLE [GENDER](GENDERID INT IDENTITY(1,1) PRIMARY KEY, GENDERNAME VARCHAR(25))
 GO
-Create table [User](UserID uniqueidentifier Primary Key, FirstName varchar(255), LastName varchar(255), Email varchar(255), password nvarchar(1048), dateofbirth datetime, phonenumber varchar(100), RoleID uniqueidentifier foreign key references Role(RoleID), [GENDERID] INT FOREIGN KEY  REFERENCES GENDER(GENDERID));
+Create table [User](UserID uniqueidentifier Primary Key, FirstName varchar(50), LastName varchar(50), Email varchar(50), password nvarchar(1048), dateofbirth datetime, phonenumber varchar(15), RoleID uniqueidentifier foreign key references Role(RoleID), [GENDERID] INT FOREIGN KEY  REFERENCES GENDER(GENDERID));
 GO
-CREATE table ExpenseType(ExpenseTypeID int identity(1,1) primary key, ExpenseTypeName varchar(50), ExpenseTypeDescription varchar(255))
+CREATE table ExpenseType(ExpenseTypeID int identity(1,1) primary key, ExpenseTypeName varchar(50), ExpenseTypeDescription varchar(200))
 GO
-Create table Expense(ExpenseID uniqueidentifier primary key, ExpenseName varchar(255), ExpenseDescription varchar(500), ExpenseDate datetime, ExpenseAmount decimal(18,2), UserID uniqueidentifier foreign key references [User](UserID), ExpenseTypeID INT foreign key references [ExpenseType](ExpenseTypeID));
+Create table Expense(ExpenseID uniqueidentifier primary key, ExpenseName varchar(50), ExpenseDescription varchar(200), ExpenseDate datetime, ExpenseAmount decimal(18,2), UserID uniqueidentifier foreign key references [User](UserID), ExpenseTypeID INT foreign key references [ExpenseType](ExpenseTypeID));
 GO
-Create table InvestmentType(InvestmentTypeID INT identity(1,1) primary key, InvestmentTypeName varchar(25), InvestmentTypeDescription varchar(255))
+Create table InvestmentType(InvestmentTypeID INT identity(1,1) primary key, InvestmentTypeName varchar(50), InvestmentTypeDescription varchar(200))
 GO
-Create table Investments(InvestmentID uniqueidentifier primary key, InvestName varchar(255), InvestmentDate datetime, InvestmentAmount decimal(18,5), InvestmentDescription varchar(500), InvestmentValue5 decimal(18,5), InvestmentValue10 decimal(18,5), UserID uniqueidentifier foreign key references [User](UserID), InvestmentTypeID int foreign key references [InvestmentType](InvestmentTypeID));
+Create table Investments(InvestmentID uniqueidentifier primary key, InvestName varchar(50), InvestmentDate datetime, InvestmentAmount decimal(18,5), InvestmentDescription varchar(200), InvestmentValue5 decimal(18,5), InvestmentValue10 decimal(18,5), UserID uniqueidentifier foreign key references [User](UserID), InvestmentTypeID int foreign key references [InvestmentType](InvestmentTypeID));
 GO
 Create table InvestmentProjections(InvestmentprojectionID uniqueidentifier primary key, InvestmentProjectionYear int, InvestmentProjectionValue decimal(18,5), InvestmentID uniqueidentifier foreign key references Investments(InvestmentID))
 GO
-CREATE table UserSecretQuestion(SecretKeyQuestionID int identity(1,1) primary key, SecretKeyQuestion nvarchar(500), SecretKeyAnswer nvarchar(1096), UserID uniqueidentifier foreign key references [User](UserID))
+CREATE table UserSecretQuestion(SecretKeyQuestionID int identity(1,1) primary key, SecretKeyQuestion nvarchar(100), SecretKeyAnswer nvarchar(1096), UserID uniqueidentifier foreign key references [User](UserID))
 GO
 CREATE OR ALTER PROCEDURE spGetAllGender
 AS
